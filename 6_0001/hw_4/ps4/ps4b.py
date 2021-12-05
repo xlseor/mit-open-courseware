@@ -4,6 +4,7 @@
 # Collaborators:
 # Time Spent: x:xx
 
+
 import string
 
 ### HELPER CODE ###
@@ -105,8 +106,8 @@ class Message(object):
         Returns: a dictionary mapping a letter (string) to 
                  another letter (string). 
         '''
-        default_dict = {'a':0, 'b':1, 'c':2, 'd':3, 'e':4, 'f':5, 'g':6, 'h':7, 'i':8, 'j':9, 'k':10, 'l':11, 'm':12, 'n':13, 'o':14, 'p':15, 'q':16, 'r':17, 's':18, 't':19, 'u':20, 'v':21, 'w':22, 'x':23, 'y':24, 'z':25, 'A':26, 'B':27, 'C':28, 'D':29, 'E':30, 'F':31, 'G':32, 'H':33, 'I':34, 'J':35, 'K':36, 'L':37, 'M':38, 'N':39, 'O':40, 'P':41, 'Q':42, 'R':43, 'S':44, 'T':45, 'U':46, 'V':47, 'W':48, 'X':49, 'Y':50, 'Z':51,}
-        shifted_dict = {item: (default_dict[item]+shift)%52 for item in default_dict}
+        default_dict = {'a':0, 'b':1, 'c':2, 'd':3, 'e':4, 'f':5, 'g':6, 'h':7, 'i':8, 'j':9, 'k':10, 'l':11, 'm':12, 'n':13, 'o':14, 'p':15, 'q':16, 'r':17, 's':18, 't':19, 'u':20, 'v':21, 'w':22, 'x':23, 'y':24, 'z':25, }
+        shifted_dict = {item: (default_dict[item]+shift)%26 for item in default_dict}
         return shifted_dict
         
         
@@ -122,13 +123,18 @@ class Message(object):
         Returns: the message text (string) in which every character is shifted
              down the alphabet by the input shift
         '''
-        revert_dict = {0:'a', 1:'b', 2:'c', 3:'d', 4:'e', 5:'f', 6:'g', 7:'h', 8:'i', 9:'j', 10:'k', 11:'l', 12:'m', 13:'n', 14:'o', 15:'p', 16:'q', 17:'r', 18:'s', 19:'t', 20:'u', 21:'v', 22:'w', 23:'x', 24:'y', 25:'z', 26:'A', 27:'B', 28:'C', 29:'D', 30:'E', 31:'F', 32:'G', 33:'H', 34:'I', 35:'J', 36:'K', 37:'L', 38:'M', 39:'N', 40:'O', 41:'P', 42:'Q', 43:'R', 44:'S', 45:'T', 46:'U', 47:'V', 48:'W', 49:'X', 50:'Y', 51:'Z',}
+        revert_dict = {0:'a', 1:'b', 2:'c', 3:'d', 4:'e', 5:'f', 6:'g', 7:'h', 8:'i', 9:'j', 10:'k', 11:'l', 12:'m', 13:'n', 14:'o', 15:'p', 16:'q', 17:'r', 18:'s', 19:'t', 20:'u', 21:'v', 22:'w', 23:'x', 24:'y', 25:'z', }
         shift_dict = self.build_shift_dict(shift)
         cyphyr = ""
         message_text = self.get_message_text()
         for letter in message_text:
             if letter.isalpha():
-                cyphyr = cyphyr+revert_dict[shift_dict[letter]]
+                upper = letter.isupper()
+                shifted_letter = revert_dict[shift_dict[letter.lower()]]
+                if upper:
+                    shifted_letter=shifted_letter.upper()
+                cyphyr=cyphyr+shifted_letter
+                
             else:
                 cyphyr = cyphyr+letter
         return cyphyr
@@ -215,8 +221,8 @@ class CiphertextMessage(Message):
 
     def build_decryption_dict(self, shift): #build a decryption dictionary
         #with the shift value passed in
-        default_dict = {0:'a', 1:'b', 2:'c', 3:'d', 4:'e', 5:'f', 6:'g', 7:'h', 8:'i', 9:'j', 10:'k', 11:'l', 12:'m', 13:'n', 14:'o', 15:'p', 16:'q', 17:'r', 18:'s', 19:'t', 20:'u', 21:'v', 22:'w', 23:'x', 24:'y', 25:'z', 26:'A', 27:'B', 28:'C', 29:'D', 30:'E', 31:'F', 32:'G', 33:'H', 34:'I', 35:'J', 36:'K', 37:'L', 38:'M', 39:'N', 40:'O', 41:'P', 42:'Q', 43:'R', 44:'S', 45:'T', 46:'U', 47:'V', 48:'W', 49:'X', 50:'Y', 51:'Z',}
-        shifted_dict = {(key+shift)%52: default_dict[key] for key in default_dict}
+        default_dict = {0:'a', 1:'b', 2:'c', 3:'d', 4:'e', 5:'f', 6:'g', 7:'h', 8:'i', 9:'j', 10:'k', 11:'l', 12:'m', 13:'n', 14:'o', 15:'p', 16:'q', 17:'r', 18:'s', 19:'t', 20:'u', 21:'v', 22:'w', 23:'x', 24:'y', 25:'z', }
+        shifted_dict = {(key+shift)%26: default_dict[key] for key in default_dict}
         return shifted_dict
     
     def decrypt_message(self):
@@ -235,15 +241,18 @@ class CiphertextMessage(Message):
         Returns: a tuple of the best shift value used to decrypt the message
         and the decrypted message text using that shift value
         '''
-        def get_shift(shift, text):
+        def get_shifted_text(shift, text):
             #returns shifted text and the number of matches, as a tuple.
-            default_dict = {'a':1, 'b':2, 'c':3, 'd':4, 'e':5, 'f':6, 'g':7, 'h':8, 'i':9, 'j':10, 'k':11, 'l':12, 'm':13, 'n':14, 'o':15, 'p':16, 'q':17, 'r':18, 's':19, 't':20, 'u':21, 'v':22, 'w':23, 'x':24, 'y':25, 'z':26, 'A':27, 'B':28, 'C':29, 'D':30, 'E':31, 'F':32, 'G':33, 'H':34, 'I':35, 'J':36, 'K':37, 'L':38, 'M':39, 'N':40, 'O':41, 'P':42, 'Q':43, 'R':44, 'S':45, 'T':46, 'U':47, 'V':48, 'W':49, 'X':50, 'Y':51, 'Z':52,}
+            default_dict = {'a':0, 'b':1, 'c':2, 'd':3, 'e':4, 'f':5, 'g':6, 'h':7, 'i':8, 'j':9, 'k':10, 'l':11, 'm':12, 'n':13, 'o':14, 'p':15, 'q':16, 'r':17, 's':18, 't':19, 'u':20, 'v':21, 'w':22, 'x':23, 'y':24, 'z':25}
             decryption_dict = self.build_decryption_dict(shift)
             dcyphyr = ""
             for letter in text:
                 if letter.isalpha():
-                    num = default_dict[letter]
+                    lowered = letter.lower()
+                    num = default_dict[lowered]
                     shifted_letter = decryption_dict[num]
+                    if letter.isupper():
+                        shifted_letter=shifted_letter.upper()
                     dcyphyr = dcyphyr+shifted_letter
                 else:
                     dcyphyr = dcyphyr+letter
@@ -254,14 +263,14 @@ class CiphertextMessage(Message):
             return (shift, valids_count, dcyphyr)
 
         text = self.get_message_text()
-        shift_tuple=get_shift(0, text)
-        for num in range(1,52):
-            compare = get_shift(num, text)
+        shift_tuple=get_shifted_text(0, text)
+        for num in range(1,26):
+            compare = get_shifted_text(num, text)
             if compare[1]>shift_tuple[1]:
                 shift_tuple=compare
 
         
-        to_return = (shift_tuple[0], shift_tuple[2].lower())           
+        to_return = (shift_tuple[0], shift_tuple[2])           
         return to_return
             
 
@@ -276,6 +285,10 @@ if __name__ == '__main__':
 #    ciphertext = CiphertextMessage('jgnnq')
 #    print('Expected Output:', (24, 'hello'))
 #    print('Actual Output:', ciphertext.decrypt_message())
+
+    my_message = PlaintextMessage('BoRuS', 4)
+    print(my_message.get_message_text())
+
     print("testcase 1: malted, shift 4")
     plaintext = PlaintextMessage('malted', 4)
     print("plaintext to cipher:")
@@ -292,12 +305,12 @@ if __name__ == '__main__':
     print("testcase 2: Zones, shift 12")
     print("plaintext to cipher: ")
     plaintext = PlaintextMessage('Zones', 12)
-    print("Expected Output: lAzqE")
+    print("Expected Output: Lazqe")
     print("Actual Output: ", plaintext.get_message_text_encrypted())
     print("")
 
     print("cipher to plaintext")
-    cyphertext = CiphertextMessage('lAzqE')
+    cyphertext = CiphertextMessage('Lazqe')
     print("Expected Output : Zones")
     print("Actual Output :", cyphertext.decrypt_message())
     print("")
@@ -309,4 +322,6 @@ if __name__ == '__main__':
     print("")
     print(story.decrypt_message())
     
-    """ 15, 'jack florey is a mythical character created on the spur of a moment to help cover an insufficiently planned hack. he has been registered for classes at mit twice before, but has reportedly never passed aclass. it has been the tradition of the residents of east campus to become jack florey for a few nights each year to educate incoming students in the ways, means, and ethics of hacking.'"""
+    """ 
+    (14, 'Jack Florey is a mythical character created on the spur of a moment to help cover an insufficiently planned hack. He has been registered for classes at MIT twice before, but has reportedly never passed aclass. It has been the tradition of the residents of East Campus to become Jack Florey for a few nights each year to educate incoming students in the ways, means, and ethics of hacking.')
+   """
