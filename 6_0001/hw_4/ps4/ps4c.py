@@ -59,6 +59,7 @@ VOWELS_UPPER = 'AEIOU'
 CONSONANTS_LOWER = 'bcdfghjklmnpqrstvwxyz'
 CONSONANTS_UPPER = 'BCDFGHJKLMNPQRSTVWXYZ'
 
+word_list = load_words(WORDLIST_FILENAME)
 class SubMessage(object):
     def __init__(self, text):
         '''
@@ -114,14 +115,16 @@ class SubMessage(object):
         upper_vowel_shuffle = vowels_permutation.upper()
         con_upper_dict = {con:con for con in CONSONANTS_UPPER}
         con_lower_dict = {con:con for con in CONSONANTS_LOWER}
-        vowel_upper_dict = {VOWELS_UPPER[k]:upper_vowel_shuffle[k] for k in range(0,4)}
-        vowel_lower_dict = {VOWELS_LOWER[k]:lower_vowel_shuffle[k] for k in range(0,4)}
+        vowel_upper_dict = {VOWELS_UPPER[k]:upper_vowel_shuffle[k] for k in range(0,5)}
+        vowel_lower_dict = {VOWELS_LOWER[k]:lower_vowel_shuffle[k] for k in range(0,5)}
 
         return {**con_upper_dict, **con_lower_dict, **vowel_upper_dict, **vowel_lower_dict}
+
     
-        
 
         
+
+    
         
     
     def apply_transpose(self, transpose_dict):
@@ -174,7 +177,22 @@ class EncryptedSubMessage(SubMessage):
         Hint: use your function from Part 4A
         '''
         vowel_permutations = get_permutations(VOWELS_LOWER)
-    
+        def try_permutation(text, permutation): #return a tuple, (number of valid words in text with permutation applied, text with permutation applied)
+            transpose_dict = self.build_transpose_dict(permutation)
+            transposed = self.apply_transpose(transpose_dict)
+            validity = 0
+            for word in transposed.split():  #later, may want to refactor this for linear time...
+                if is_word(word_list, word):
+                    validity+=1
+            return (validity, transposed)
+        textual = self.get_message_text()
+        decryption_tuple = try_permutation(textual, vowel_permutations[0])
+        for permutation in vowel_permutations:
+            substitution = try_permutation(textual, permutation)
+            if substitution[0]>decryption_tuple[0]:
+                decryption_tuple=substitution
+        output = decryption_tuple[1]
+        return output
 
 if __name__ == '__main__':
 
@@ -189,3 +207,22 @@ if __name__ == '__main__':
     print("Decrypted message:", enc_message.decrypt_message())
      
     #TODO: WRITE YOUR TEST CASES HERE
+
+    message = SubMessage("that funky monkey")
+    permutation = "ouiae"
+    enc_dict = message.build_transpose_dict(permutation)
+    print("Original message:", message.get_message_text(), "Permutation:", permutation)
+    print("Expected encryption:", "thot fenky mankuy")
+    print("Actual encryption:", message.apply_transpose(enc_dict))
+    enc_message = EncryptedSubMessage(message.apply_transpose(enc_dict))
+    print("Decrypted message:", enc_message.decrypt_message())
+
+    message = SubMessage("chirp, flail, encrypt, and house")
+    permutation = "uieao"
+    enc_dict = message.build_transpose_dict(permutation)
+    print("Original message:", message.get_message_text(), "Permutation:", permutation)
+    print("Expected encryption:", "cherp, fluel, incrypt, and haosi")
+    print("Actual encryption:", message.apply_transpose(enc_dict))
+    enc_message = EncryptedSubMessage(message.apply_transpose(enc_dict))
+    print("Decrypted message:", enc_message.decrypt_message())
+
